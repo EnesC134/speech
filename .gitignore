@@ -183,3 +183,6 @@ cython_debug/
 #meine geschützte Dateien sollen nicht geladen werden
 no_git_*
 
+#beispiele sollen nicht hochgeladen werden
+beispiele/
+

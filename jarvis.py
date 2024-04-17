@@ -35,7 +35,7 @@ def start_jarvis(ACCESS_KEY, wakewords:list=None )->None:
     None
     """
     #access_key = os.getenv('PORCUPINE_ACCESS_KEY')
-    ic(ACCESS_KEY)
+
     porcupine = None
     audio_stream = None
     jarvis_ausgabe =Jarvis_Ausgabe(konsole=True, sprache=False)

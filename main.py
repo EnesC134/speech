@@ -8,7 +8,6 @@ if __name__ == '__main__':
     load_dotenv('./env/no_git_porcupine_key.env')
     key =None
     key = os.getenv('PORCUPINE_KEY')   
-    ic(key)
     
     if key is not None:
         start_jarvis(ACCESS_KEY=key, wakewords=["picovoice","alexa", "terminator","blub"])

@@ -2,3 +2,8 @@
     {% client %}(weißt du etwas über|was ist|was|wer ist|wer|sag mir etwas über|erzähl mir etwas über) (?P<query>.*){% endclient %}
     {% response %}{% call wasIst: %query %}{% endresponse %}
 {% endblock %}
+
+{% block %}
+    {% client %}(analysiere berichte|analyse|analysiere) {% endclient %}
+    {% response %}{% call Praktikumsberichte:None %}{% endresponse %}
+{% endblock %}

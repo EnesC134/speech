@@ -1,6 +1,6 @@
 from jarvis_ausgabe_sprache import Jarvis_Sprachausgabe
 
-class Jarvis_ausgabe:
+class Jarvis_Ausgabe:
     """
     Klasse für die Ausgabe von Jarvis
     """

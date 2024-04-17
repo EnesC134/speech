@@ -1,9 +1,13 @@
-import os
+import os, sys
 from chatbot import Chat, register_call
 from icecream import ic
+from jarvis_ausgabe import Jarvis_Ausgabe
 
 #Imports für Chat-Funktionen
 import wikipedia
+sys.path.append('/home/andy/Dokumente/workspace/')
+sys.path.append('/home/andy/Dokumente/workspace/FOS_Praktikumsberichte')
+from FOS_Praktikumsberichte import main as berichte
 
 # Der Chatbot ist zu finden auf:
 # https://github.com/ahmadfaizalbh/Chatbot/
@@ -14,7 +18,7 @@ class Jarvis_ChatBot(Chat):
     Eine Wrapper-Klasse für den Chatbot, die von der ChatBot-Klasse erbt.
     """
 
-    def __init__(self):
+    def __init__(self,ausgabe:Jarvis_Ausgabe, *args, **kwargs):
         """
         Initialisiert den Wrapper und ruft den Konstruktor der übergeordneten Klasse auf.
 
@@ -22,50 +26,56 @@ class Jarvis_ChatBot(Chat):
         """
         self.MAIN_FILE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
         self.DIALOG_TEMPLATE = self.MAIN_FILE_DIR + '/chat_dialog/dialog.template'
+        self.jarvis_ausgabe = ausgabe
         ic("DIALOG_TEMPLATE: ", self.DIALOG_TEMPLATE)
-        super().__init__(self.DIALOG_TEMPLATE)
-
+        super().__init__(self.DIALOG_TEMPLATE, *args, **kwargs)
     
-    
-    
-    def conv(self, input:str, consol_out:bool=True, speech_out:bool=True) -> bool:
+    def conversation(self, input:str) -> str:
         """
-        Führt eine Konversation mit dem Chatbot durch.
+        Führt eine Konversation mit dem Chatbot durch und gibt die Antwort zurück.
 
         :param input: Die Eingabe für den Chatbot.
-        :param consol_out: Gibt an, ob die Ausgabe in der Konsole angezeigt werden soll.
-        :param speech_out: Gibt an, ob die Ausgabe als Sprachausgabe ausgegeben werden soll.
-        :return: False
+        :return: Die Antwort des Chatbots auf die Eingabe.
         """
-        output = self.get_response(input)
-    
-        if consol_out:
-            print(output)
-    
-        if speech_out:
-            # Aufruf für Sprachausgabe
-            raise NotImplementedError("Speech aufruf in \"Jarvis_bot.conf\" ist noch nicht implementiert.")
+        return self.respond(input)
 
-        return False
+    ############################################
+    ###
+    ### Chatbot Funktionen
+    ###
+    ############################################
 
-############################################
-###
-### Chatbot Funktionen
-###
-############################################
-
+       
 @register_call("wasIst")
-def search_wikipedia(session, query:str):
-    ic ("Call \"search_wikipedia\" was called with query: ",query)
+def who_is(session, query:str):
+    """
+    TEIL DES CHATBOTS
+
+    Args:
+        session (_type_): _description_
+        query (str): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    ic ("Call wasIst was called with query: ",query)
     
     try:
-        return wikipedia.summary(query)
+        wikipedia.set_lang("de")
+        return wikipedia.summary(query, sentences=1)
     
     except Exception:
         for new_query in wikipedia.search(query):
             try:
-                return wikipedia.summary(new_query)
+                return wikipedia.summary(new_query, sentences=1)
             except Exception:
-                print ("Konnte keine Infos finden.")
+                self.jarvis_ausgabe.ausgabe ("Konnte keine Infos finden.")
     
-    ic ("Can't answer to ", query)  
+    ic ("Can't answer to ", query)    
+
+@register_call("Praktikumsberichte")
+def praktikumsberichte(session, query:str):
+    ic ("Praktiumsberichte was called.")
+    berichte.main()
+    return "Praktikumsberichte werden geladen. Bitte warten."
+    

@@ -8,6 +8,13 @@ from pvrecorder import PvRecorder
 import wave
 from datetime import datetime
 
+from vosk import Model, KaldiRecognizer
+import json
+import pyaudio
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '/home/andy/Dokumente/workspace/porcupine/binding/python'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '/home/andy/Dokumente/workspace/porcupine/resources/util/python'))
+
 
             
 def start_jarvis(access_key:str, wakewords:list=None )->None:
@@ -26,7 +33,10 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
 
     porcupine = None
     audio_stream = None
-        
+    
+    model = Model ('sprachmodelle/vosk-model-de-0.21')
+    recognizer = KaldiRecognizer(model, 16000)
+    pa:pyaudio = None        
     wakewords=check_wakeword_list(wakewords)
     
     try:
@@ -36,22 +46,38 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
         )
 
         print('Porcupine version: %s' % porcupine.version)
+        pa = pyaudio.PyAudio()
+        audio_stream = pa.open(
+            rate=porcupine.sample_rate, 
+            channels=1, 
+            format=pyaudio.paInt16, 
+            input=True, 
+            frames_per_buffer=porcupine.frame_length,
+            input_device_index=-1)
         
-        audio_stream = PvRecorder(
-            frame_length=porcupine.frame_length,
-            device_index=-1)
-        audio_stream.start()
-
         print('Listening for keywords ' + ', '.join(wakewords) + '. Press Ctrl+C to exit.')
     
+        is_lisetening = False
         while True:
-            pcm = audio_stream.read()
+            pcm = audio_stream.read(porcupine.frame_length)
+            pcm_unpacked = struct.unpack_from("h" * porcupine.frame_length, pcm)    
             
-            result = porcupine.process(pcm)
+            result = porcupine.process(pcm_unpacked)
            
             if result >= 0:
+                is_lisetening = True
                 print('[%s] Detected %s' % (str(datetime.now()), wakewords[result]))
 
+            if is_lisetening:
+                if recognizer.AcceptWaveform(pcm):
+                    result = json.loads(recognizer.Result())
+                    print(result)
+                    is_lisetening = False
+    
+    
+    
+    
+    
     except KeyboardInterrupt:
         print('stopping...')
     finally:
@@ -61,7 +87,13 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
             
         if audio_stream is not None:
             print("close audio stream")
-            audio_stream.delete()
+            audio_stream.close()
+        
+        if pa is not None:
+            print("terminate pyaudio")
+            pa.terminate()
+        
+
 
 
 def check_wakeword_list(wakewords:list)->list:

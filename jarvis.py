@@ -16,6 +16,8 @@ from chatbot import Chat, register_call
 
 import wikipedia
 
+import pyttsx3
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '/home/andy/Dokumente/workspace/porcupine/binding/python'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '/home/andy/Dokumente/workspace/porcupine/resources/util/python'))
 
@@ -38,8 +40,8 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
     porcupine = None
     audio_stream = None
     
-    #model = Model ('sprachmodelle/vosk-model-de-0.21')      # Großes Model mit 1,4 GB
-    model = Model ('sprachmodelle/vosk-model-small-de-zamia-0.3') #kleines Model mit 50MB
+    model = Model ('sprachmodelle/vosk-model-de-0.21')      # Großes Model mit 1,4 GB
+    #model = Model ('sprachmodelle/vosk-model-small-de-zamia-0.3') #kleines Model mit 50MB
     
     recognizer:KaldiRecognizer = KaldiRecognizer(model, 16000)
     pa:pyaudio = None        
@@ -54,8 +56,14 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
     
     wikipedia.set_lang("de")
     
-    
-    
+    tts=pyttsx3.init()
+    voices = tts.getProperty('voices')
+    #for v in voices:
+    #    print (v.id)
+    tts.setProperty('voice', 'german')
+    tts.say ("Hallo, ich bin Jarvis. Wie kann ich Ihnen helfen?")
+    tts.runAndWait()
+        
     @register_call("wasIst")
     def who_is(session, query:str):
         """
@@ -95,6 +103,8 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
         """
         output = chat.respond(input)
         print (output)
+        tts.say(output)
+        tts.runAndWait()
         return False
     
     

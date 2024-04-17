@@ -22,7 +22,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '/home/andy/Dokumente/wo
 
 
             
-def start_jarvis(access_key:str, wakewords:list=None )->None:
+def start_jarvis(ACCESS_KEY, wakewords:list=None )->None:
     """
     Startet den Jarvis Sprachassistenten.
 
@@ -35,7 +35,7 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
     None
     """
     #access_key = os.getenv('PORCUPINE_ACCESS_KEY')
-
+    ic(ACCESS_KEY)
     porcupine = None
     audio_stream = None
     jarvis_ausgabe =Jarvis_Ausgabe(konsole=True, sprache=False)
@@ -55,7 +55,7 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
     
     try:
         porcupine = pvporcupine.create(
-            access_key=access_key, 
+            access_key=ACCESS_KEY, 
             keywords=wakewords
         )
 

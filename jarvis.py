@@ -12,6 +12,9 @@ from vosk import Model, KaldiRecognizer
 import json
 import pyaudio
 
+from Jarvis_bot import Chat, register_call
+
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '/home/andy/Dokumente/workspace/porcupine/binding/python'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '/home/andy/Dokumente/workspace/porcupine/resources/util/python'))
 
@@ -40,6 +43,50 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
     recognizer:KaldiRecognizer = KaldiRecognizer(model, 16000)
     pa:pyaudio = None        
     wakewords:list[str]=check_wakeword_list(wakewords)
+    
+    
+    MAIN_FILE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+    DIALOG_TEMPLATE =MAIN_FILE_DIR + '/chat_dialog/dialog.template'
+    ic("DIALOG_TEMPLATE: ", DIALOG_TEMPLATE)
+
+    chat=Chat(DIALOG_TEMPLATE)
+    
+    
+    @register_call("wasIst")
+    def who_is(session, query:str):
+        """
+        TEIL DES CHATBOTS
+
+        Args:
+            session (_type_): _description_
+            query (str): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        ic ("Call wasIst was called with query: ",query)
+        
+        try:
+            return "Got query!"
+        except Exception:
+            pass
+        
+        ic ("Can't answer to ", query)    
+        
+    def conv(input:str)->bool:
+        """
+        TEIL DES CHATBOTS
+        nimmt die chatanfrage entgegen
+
+        Args:
+            input (str): die Anfrage vom Benutzer an den chatbot
+
+        Returns:
+            bool: immer False, weil das in Jarvis benötigt wird um das is_listen zu beenden.
+        """
+        output = chat.respond(input)
+        return False
+    
     
     try:
         porcupine = pvporcupine.create(
@@ -74,7 +121,7 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
                 if recognizer.AcceptWaveform(pcm):
                     result = json.loads(recognizer.Result())
                     ic ("Ich habe verstanden: "+ result["text"])
-                    is_lisetening = False
+                    is_lisetening = conv(result['text'])
                     print('Listening for keywords ' + ', '.join(wakewords) + '. Press Ctrl+C to exit.')
     
     

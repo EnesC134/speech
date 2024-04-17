@@ -186,3 +186,5 @@ no_git_*
 #beispiele sollen nicht hochgeladen werden
 beispiele/
 
+#sprachmodelle sollen nicht hochgeladen werden
+sprachmodelle/

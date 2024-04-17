@@ -69,7 +69,7 @@ def who_is(session, query:str):
             try:
                 return wikipedia.summary(new_query, sentences=1)
             except Exception:
-                self.jarvis_ausgabe.ausgabe ("Konnte keine Infos finden.")
+                return "Konnte keine Infos finden."
     
     ic ("Can't answer to ", query)    
 
@@ -77,5 +77,5 @@ def who_is(session, query:str):
 def praktikumsberichte(session, query:str):
     ic ("Praktiumsberichte was called.")
     berichte.main()
-    return "Praktikumsberichte werden geladen. Bitte warten."
+    return "Praktikumsberichte wurden analysiert. Die Auswertungsdateien stehen im Ordner zur Verfügung."
     

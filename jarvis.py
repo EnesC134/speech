@@ -12,8 +12,9 @@ from vosk import Model, KaldiRecognizer
 import json
 import pyaudio
 
-from Jarvis_bot import Chat, register_call
+from chatbot import Chat, register_call
 
+import wikipedia
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '/home/andy/Dokumente/workspace/porcupine/binding/python'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '/home/andy/Dokumente/workspace/porcupine/resources/util/python'))
@@ -51,6 +52,9 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
 
     chat=Chat(DIALOG_TEMPLATE)
     
+    wikipedia.set_lang("de")
+    
+    
     
     @register_call("wasIst")
     def who_is(session, query:str):
@@ -67,9 +71,14 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
         ic ("Call wasIst was called with query: ",query)
         
         try:
-            return "Got query!"
+            return wikipedia.summary(query, sentences=1)
+        
         except Exception:
-            pass
+            for new_query in wikipedia.search(query):
+                try:
+                    return wikipedia.summary(new_query, sentences=1)
+                except Exception:
+                    print ("Konnte keine Infos finden.")
         
         ic ("Can't answer to ", query)    
         
@@ -85,6 +94,7 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
             bool: immer False, weil das in Jarvis benötigt wird um das is_listen zu beenden.
         """
         output = chat.respond(input)
+        print (output)
         return False
     
     

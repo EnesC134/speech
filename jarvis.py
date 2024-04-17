@@ -34,10 +34,12 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
     porcupine = None
     audio_stream = None
     
-    model = Model ('sprachmodelle/vosk-model-de-0.21')
-    recognizer = KaldiRecognizer(model, 16000)
+    #model = Model ('sprachmodelle/vosk-model-de-0.21')      # Großes Model mit 1,4 GB
+    model = Model ('sprachmodelle/vosk-model-small-de-zamia-0.3') #kleines Model mit 50MB
+    
+    recognizer:KaldiRecognizer = KaldiRecognizer(model, 16000)
     pa:pyaudio = None        
-    wakewords=check_wakeword_list(wakewords)
+    wakewords:list[str]=check_wakeword_list(wakewords)
     
     try:
         porcupine = pvporcupine.create(
@@ -71,9 +73,9 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
             if is_lisetening:
                 if recognizer.AcceptWaveform(pcm):
                     result = json.loads(recognizer.Result())
-                    print(result)
+                    ic ("Ich habe verstanden: "+ result["text"])
                     is_lisetening = False
-    
+                    print('Listening for keywords ' + ', '.join(wakewords) + '. Press Ctrl+C to exit.')
     
     
     
@@ -96,7 +98,7 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
 
 
 
-def check_wakeword_list(wakewords:list)->list:
+def check_wakeword_list(wakewords:list[str])->list[str]:
     """
     Überprüft die Liste der Schlüsselwörter und fügt das Standard-Schlüsselwort "jarvis" hinzu, 
     wenn es nicht in der Liste enthalten ist.
@@ -109,8 +111,8 @@ def check_wakeword_list(wakewords:list)->list:
     Returns:
     list: Eine Liste von "Schlüsselworten", auf die der Assistent reagieren soll. 
     """
-    allowed_wakewords:list = list(pvporcupine.KEYWORDS)
-    my_wakewords:list=[]
+    allowed_wakewords:list[str] = list(pvporcupine.KEYWORDS)
+    my_wakewords:list[str]=[]
     
     for word in wakewords:
         if word not in allowed_wakewords:

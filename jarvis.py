@@ -1,3 +1,6 @@
+import jarvis_ausgabe
+from jarvis_bot import Jarvis_ChatBot
+
 import os, sys, struct
 from icecream import ic
 import pvporcupine
@@ -16,7 +19,7 @@ from chatbot import Chat, register_call
 
 import wikipedia
 
-import pyttsx3
+
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '/home/andy/Dokumente/workspace/porcupine/binding/python'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '/home/andy/Dokumente/workspace/porcupine/resources/util/python'))
@@ -39,30 +42,26 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
 
     porcupine = None
     audio_stream = None
+    jarvis =jarvis_ausgabe.Jarvis_ausgabe(konsole=True, sprache=True)
     
-    model = Model ('sprachmodelle/vosk-model-de-0.21')      # Großes Model mit 1,4 GB
-    #model = Model ('sprachmodelle/vosk-model-small-de-zamia-0.3') #kleines Model mit 50MB
+    #model = Model ('sprachmodelle/vosk-model-de-0.21')      # Großes Model mit 1,4 GB
+    model = Model ('sprachmodelle/vosk-model-small-de-zamia-0.3') #kleines Model mit 50MB
     
     recognizer:KaldiRecognizer = KaldiRecognizer(model, 16000)
     pa:pyaudio = None        
     wakewords:list[str]=check_wakeword_list(wakewords)
     
     
-    MAIN_FILE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-    DIALOG_TEMPLATE =MAIN_FILE_DIR + '/chat_dialog/dialog.template'
-    ic("DIALOG_TEMPLATE: ", DIALOG_TEMPLATE)
+    #MAIN_FILE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+    #DIALOG_TEMPLATE =MAIN_FILE_DIR + '/chat_dialog/dialog.template'
+    #ic("DIALOG_TEMPLATE: ", DIALOG_TEMPLATE)
 
-    chat=Chat(DIALOG_TEMPLATE)
-    
+    #chat=Chat(DIALOG_TEMPLATE)
+    chat = Jarvis_ChatBot()
     wikipedia.set_lang("de")
     
-    tts=pyttsx3.init()
-    voices = tts.getProperty('voices')
-    #for v in voices:
-    #    print (v.id)
-    tts.setProperty('voice', 'german')
-    tts.say ("Hallo, ich bin Jarvis. Wie kann ich Ihnen helfen?")
-    tts.runAndWait()
+    jarvis.ausgabe("Hallo, ich bin Jarvis. Wie kann ich Ihnen helfen?") 
+    
         
     @register_call("wasIst")
     def who_is(session, query:str):
@@ -86,7 +85,7 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
                 try:
                     return wikipedia.summary(new_query, sentences=1)
                 except Exception:
-                    print ("Konnte keine Infos finden.")
+                    jarvis.ausgabe ("Konnte keine Infos finden.")
         
         ic ("Can't answer to ", query)    
         
@@ -102,9 +101,8 @@ def start_jarvis(access_key:str, wakewords:list=None )->None:
             bool: immer False, weil das in Jarvis benötigt wird um das is_listen zu beenden.
         """
         output = chat.respond(input)
-        print (output)
-        tts.say(output)
-        tts.runAndWait()
+        jarvis.ausgabe (output)
+     
         return False
     
     

@@ -1,13 +1,4 @@
 {% block %}
-    {% client %}(weißt du etwas über|was ist|was|wer ist|wer|sag mir etwas über|erzähl mir etwas über) (?P<query1>.*)(,| and | \& )(?P<query2>.*){% endclient %}
-    {% response %}
-           {% chat %1 %query1 %}
-           ------------------------------------
-           {% chat %1 %query2 %}
-    {% endresponse %}
-{% endblock %}
-
-{% block %}
     {% client %}(weißt du etwas über|was ist|was|wer ist|wer|sag mir etwas über|erzähl mir etwas über) (?P<query>.*){% endclient %}
     {% response %}{% call wasIst: %query %}{% endresponse %}
 {% endblock %}
